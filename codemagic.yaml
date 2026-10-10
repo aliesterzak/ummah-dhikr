@@ -1,3 +1,24 @@
-git add codemagic.yaml
-git commit -m 'Add first workflow'
-git push
+workflows:
+  android-debug:
+    name: Dhikr al-Ummah - Debug APK
+    max_build_duration: 30
+    environment:
+      java: 17
+    scripts:
+      - name: Set Android SDK
+        script: |
+          sdkmanager --install "platforms;android-34" "build-tools;34.0.0" "platform-tools"
+      
+      - name: Create Gradle Wrapper if missing
+        script: |
+          if [ ! -f "./gradlew" ]; then
+            gradle wrapper --gradle-version 8.5
+          fi
+          chmod +x ./gradlew
+      
+      - name: Build Debug APK
+        script: |
+          ./gradlew assembleDebug --stacktrace
+    
+    artifacts:
+      - app/build/outputs/apk/debug/*.apk
